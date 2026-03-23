@@ -22,7 +22,21 @@ CREATE TABLE ingredients (
     ingredient_id INT AUTO_INCREMENT PRIMARY KEY,
     recipe_id INT,
     name VARCHAR(100) NOT NULL,
-    category ENUM('meat', 'vegetable', 'seasoning') NOT NULL,
+    category ENUM(
+        'protein',
+        'vegetable',
+        'fruit',
+        'grain',
+        'dairy',
+        'seasoning',
+        'herb',
+        'sauce',
+        'liquid',
+        'other'
+    ) DEFAULT NULL,
+    quantity VARCHAR(50) DEFAULT NULL,
+    unit VARCHAR(20) DEFAULT NULL,
+    notes VARCHAR(200) DEFAULT NULL,
     FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id) ON DELETE CASCADE
 );
 
