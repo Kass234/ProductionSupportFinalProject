@@ -1,7 +1,7 @@
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password":"mySQL_Password", # Change this
+    "password":"RootPassword", # Change this
     "database": "recipedb"
 
 }
