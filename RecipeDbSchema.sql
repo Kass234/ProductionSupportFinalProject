@@ -43,10 +43,9 @@ CREATE TABLE ingredients (
 CREATE TABLE ratings (
     rating_id INT AUTO_INCREMENT PRIMARY KEY,
     recipe_id INT,
-    user_id INT,
     score INT NOT NULL,
     created_at DATETIME,
-    FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    UNIQUE KEY unique_rating (recipe_id, user_id)
+    FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id) ON DELETE CASCADE
 );
+
+INSERT INTO users (username, email) VALUES ("testuser", "test@email.com");
