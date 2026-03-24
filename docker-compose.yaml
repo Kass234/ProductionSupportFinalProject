@@ -1,5 +1,3 @@
-version: "3.9"  # Docker Compose 3.9 
-
 services:  
   
   backend:  # service for Flask-app
