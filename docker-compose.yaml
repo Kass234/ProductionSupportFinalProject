@@ -1,0 +1,26 @@
+services:  
+  
+  backend:  # service for Flask-app
+    build: .  # build image from dir with Dockerfile
+    container_name: recipe_backend  # container for control and logs
+    ports:
+      - "5001:5000"  # Port check: localhost:5000 -> port 5000 in container (Flask listens 5000) 5001 for internal Mac setup
+    environment:
+      - FLASK_ENV=development  # Env var, enabeling debug Flask
+    depends_on:
+      - db  # provides startup order: backend starts after db (container MySQL)
+
+  db:  # MySQL
+    image: mysql:8  
+    container_name: recipe_db  # container to connect to backend
+    restart: always  # auto restart if needed
+    environment:
+      MYSQL_ROOT_PASSWORD: RootPassword  # root user password for db
+      MYSQL_DATABASE: recipedb  # creates recepedb with first start
+    ports:
+      - "3307:3306"  # Exposure MySQL port to outside, so host can get connected (3307 for internal Mac setup cuz 3306 is occupied)
+    volumes:
+      - db_data:/var/lib/mysql  # Volume build to save db between starts
+
+volumes:
+  db_data:  # Renewal of volume data on MySQL host (data will not get lost if container deleted)
