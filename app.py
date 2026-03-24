@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from model import RecipeModel
+from models.recipe_model import RecipeModel
+from models.rating_model import RatingModel
 
 app = Flask(__name__)
 CORS(app)
