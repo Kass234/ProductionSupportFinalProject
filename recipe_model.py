@@ -55,4 +55,19 @@ class RecipeModel:
         return recipe_found
     
     def delete_recipe(self,recipe_id,user_id):
+        sql = "SELECT * from recipes where recipe_id = %s"
+        self.cursor.execute(sql,(recipe_id,))
+        recipe_found =self.cursor.fetchone()
+        if recipe_found["user_id"]== user_id:
+            sql1 = "Delete from recipes where recipe_id = %s"
+            self.cursor.execute(sql1,(recipe_id,))
+            self.conn.commit()
+            return{"message":"Recipe succesfully deleted"}
+        else:
+            return{"error": "Unauthorized- you can only delete your own recipe"}
+    
+    def share_recipe(self,recipe_id):
+        recipe = self.get_recipe(recipe_id)
+        return recipe
+
         
