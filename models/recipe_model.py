@@ -5,7 +5,7 @@ from datetime import  datetime
 
 class RecipeModel:
     def __init__(self):
-        self.conn = mysql.connector.connect(**DB_CONFIG)
+        self.conn = mysql.connector.connect(DB_CONFIG)
         self.cursor = self.conn.cursor(dictionary=True)
 
     def __del__(self):

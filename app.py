@@ -50,6 +50,7 @@ def share_recipe(recipe_id):
     data = model.share_recipe(recipe_id)
     return jsonify(data)
 
+#adds the ratings
 @app.route('/api/recipes/<int:recipe_id>/rate',methods=['POST'])
 def add_rating(recipe_id):
     data = request.get_json()
