@@ -43,6 +43,21 @@ def delete_recipe(recipe_id):
     recipe_data=model.delete_recipe(recipe_id,user_id)
     return jsonify(recipe_data),200
 
+#shares the recipe
+@app.route('/api/recipes/<int:recipe_id>/share')
+def share_recipe(recipe_id):
+    model =RecipeModel()
+    data = model.share_recipe(recipe_id)
+    return jsonify(data)
+
+@app.route('/api/recipes/<int:recipe_id>/rate',methods=['POST'])
+def add_rating(recipe_id):
+    data = request.get_json()
+    user_id = data["user_id"]
+    score = data["score"]
+    model =RatingModel()
+    rating_data = model.add_rating(user_id,recipe_id,score)
+    return jsonify(rating_data),200
 
 if __name__ == "__main__":
     app.run(debug=True)
