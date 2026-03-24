@@ -1,3 +1,7 @@
-Flask
-flask-cors
-mysql-connector-python
+Requirements - 
+-Ability to upload a recipe(name of user, name, description,ingridients(meat,vegtaebles,seasoning),cooking method,rating)
+-Ability to update a rating from different users
+-Delete a recipe 
+-Display recipes and allow the ability to rate on same page
+-Share everything
+-
