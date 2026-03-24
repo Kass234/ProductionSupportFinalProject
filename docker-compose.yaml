@@ -4,7 +4,7 @@ services:
     build: .  # build image from dir with Dockerfile
     container_name: recipe_backend  # container for control and logs
     ports:
-      - "5000:5000"  # Port check: localhost:5000 -> port 5000 in container (Flask listens 5000)
+      - "5001:5000"  # Port check: localhost:5000 -> port 5000 in container (Flask listens 5000) 5001 for internal Mac setup
     environment:
       - FLASK_ENV=development  # Env var, enabeling debug Flask
     depends_on:
