@@ -34,6 +34,7 @@ def create_recipe():
     recipe_data =model.create_recipe(user_id,recipe_name,description,cooking_method,ingredients)
     return jsonify(recipe_data),201
 
+#Delets a recipe but only if the the user created the original recipe
 @app.route("/api/recipes/<int:recipe_id>",methods=["DELETE"])
 def delete_recipe(recipe_id):
     data = request.get_json()
