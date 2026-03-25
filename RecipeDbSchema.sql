@@ -33,3 +33,4 @@ CREATE TABLE ratings (
     created_at DATETIME,
     FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id) ON DELETE CASCADE
 );
+INSERT INTO users (username, email) VALUES ("testuser", "test@email.com");
