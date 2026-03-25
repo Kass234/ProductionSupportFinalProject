@@ -16,6 +16,10 @@ class RatingModel:
         self.cursor.execute(sql_average, (recipe_id,))
         result = self.cursor.fetchone()
         average = result["AVG(score)"] if result["AVG(score)"] is not None else 0.0
+        
+        # Round to 1 decimal place
+        average = round(average, 1)
+        
         sql_update = "UPDATE recipes SET average_rating = %s where recipe_id = %s"
         self.cursor.execute(sql_update, (average, recipe_id))
         self.conn.commit()
