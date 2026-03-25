@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Recipe_app
 
 This template should help get you started developing with Vue 3 in Vite.
@@ -42,3 +43,7 @@ npm run build
 ```sh
 npm run lint
 ```
+=======
+# ProductionSupportFinalProject
+Cooking App
+>>>>>>> f64f26da068b1208a99d47eebcde8223d87315fc
