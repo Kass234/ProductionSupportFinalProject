@@ -71,5 +71,38 @@ def get_recipe_ratings(recipe_id):
     ratings = model.get_recipe_ratings(recipe_id)
     return jsonify(ratings), 200
 
+@app.route("/api/recipes/<int:recipe_id>", methods=["PUT"])
+def update_recipe(recipe_id):
+    data = request.get_json()
+    user_id = data.get("user_id")  # Use .get() to avoid KeyError
+    
+    if not user_id:
+        return jsonify({"error": "user_id is required"}), 400
+    
+    # Get optional fields (they might not be provided)
+    recipe_name = data.get("recipe_name")
+    description = data.get("description")
+    cooking_method = data.get("cooking_method")
+    ingredients = data.get("ingredients")
+    
+    # Validate that at least one field to update is provided
+    if not any([recipe_name, description, cooking_method, ingredients]):
+        return jsonify({"error": "At least one field to update (recipe_name, description, cooking_method, or ingredients) must be provided"}), 400
+    
+    model = RecipeModel()
+    updated_recipe = model.update_recipe(
+        recipe_id, 
+        user_id, 
+        recipe_name, 
+        description, 
+        cooking_method, 
+        ingredients
+    )
+    
+    # Check if there was an error
+    if "error" in updated_recipe:
+        return jsonify(updated_recipe), 403 if "Unauthorized" in updated_recipe["error"] else 404
+    
+    return jsonify(updated_recipe), 200
 if __name__ == "__main__":
     app.run(debug=True)
