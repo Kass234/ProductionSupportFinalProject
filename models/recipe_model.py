@@ -20,30 +20,47 @@ class RecipeModel:
         self.conn.commit()
         rowid = self.cursor.lastrowid
         
-        # Insert each ingredient as a simple text string
-        for ingredient in ingredients:
-            # Check if ingredient is a string or dict
+        formatted_ingredients = []
+        
+        # Check if ingredients is a list or a string
+        if isinstance(ingredients, str):
+            # If it's a string, treat it as a single ingredient
+            ingredients_list = [ingredients]
+        elif isinstance(ingredients, list):
+            # If it's already a list, use it directly
+            ingredients_list = ingredients
+        else:
+            # Default to empty list
+            ingredients_list = []
+        
+        # Insert each ingredient
+        for ingredient in ingredients_list:
+            # Handle different input formats
             if isinstance(ingredient, dict):
-                # If it's a dict, combine fields into a readable string
-                ingredient_text = f"{ingredient.get('name', '')} - {ingredient.get('quantity', '')} {ingredient.get('unit', '')} ({ingredient.get('notes', '')})".strip()
+                # Format detailed ingredient
+                parts = []
+                if ingredient.get('quantity'):
+                    parts.append(ingredient['quantity'])
+                if ingredient.get('unit'):
+                    parts.append(ingredient['unit'])
+                if ingredient.get('name'):
+                    parts.append(ingredient['name'])
+                if ingredient.get('notes'):
+                    parts.append(f"({ingredient['notes']})")
+                ingredient_text = ' '.join(parts).strip()
                 # Clean up empty parentheses
                 ingredient_text = ingredient_text.replace('()', '').strip(' -')
             else:
-                # If it's already a string, use it directly
-                ingredient_text = ingredient
+                # Simple string ingredient
+                ingredient_text = str(ingredient).strip()
             
-            sql_for_ingredient = "INSERT into ingredients(recipe_id, ingredient_text) VALUES(%s, %s)"
-            self.cursor.execute(sql_for_ingredient, (rowid, ingredient_text))
+            # Only insert if not empty
+            if ingredient_text:
+                sql_for_ingredient = "INSERT into ingredients(recipe_id, ingredient_text) VALUES(%s, %s)"
+                self.cursor.execute(sql_for_ingredient, (rowid, ingredient_text))
+                formatted_ingredients.append(ingredient_text)
         
         self.conn.commit()
-        
-        # Format ingredients for response
-        formatted_ingredients = []
-        for ingredient in ingredients:
-            if isinstance(ingredient, dict):
-                formatted_ingredients.append(f"{ingredient.get('name', '')} - {ingredient.get('quantity', '')} {ingredient.get('unit', '')} ({ingredient.get('notes', '')})".strip().replace('()', '').strip(' -'))
-            else:
-                formatted_ingredients.append(ingredient)
         
         return {
             "recipe_id": rowid,
@@ -65,7 +82,6 @@ class RecipeModel:
             sql1 = "SELECT ingredient_text FROM ingredients where recipe_id = %s"
             self.cursor.execute(sql1, (recipe['recipe_id'],))
             ingredients = self.cursor.fetchall()
-            # Extract just the text from each ingredient
             recipe["ingredients"] = [ingredient['ingredient_text'] for ingredient in ingredients]
         
         return all_recipes
@@ -79,27 +95,9 @@ class RecipeModel:
             sql1 = "SELECT ingredient_text FROM ingredients where recipe_id = %s"
             self.cursor.execute(sql1, (recipe_found["recipe_id"],))
             ingredients = self.cursor.fetchall()
-            # Extract just the text from each ingredient
             recipe_found["ingredients"] = [ingredient['ingredient_text'] for ingredient in ingredients]
         
         return recipe_found
-    
-    def delete_recipe(self, recipe_id, user_id):
-        sql = "SELECT * from recipes where recipe_id = %s"
-        self.cursor.execute(sql, (recipe_id,))
-        recipe_found = self.cursor.fetchone()
-        
-        if recipe_found and recipe_found["user_id"] == user_id:
-            sql1 = "DELETE from recipes where recipe_id = %s"
-            self.cursor.execute(sql1, (recipe_id,))
-            self.conn.commit()
-            return {"message": "Recipe successfully deleted"}
-        else:
-            return {"error": "Unauthorized - you can only delete your own recipe"}
-    
-    def share_recipe(self, recipe_id):
-        recipe = self.get_recipe(recipe_id)
-        return recipe
     
     def update_recipe(self, recipe_id, user_id, recipe_name=None, description=None, cooking_method=None, ingredients=None):
         """
@@ -146,9 +144,20 @@ class RecipeModel:
             sql_delete_ingredients = "DELETE FROM ingredients WHERE recipe_id = %s"
             self.cursor.execute(sql_delete_ingredients, (recipe_id,))
             
+            # Prepare ingredients list
+            if isinstance(ingredients, str):
+                # If it's a string, treat it as a single ingredient
+                ingredients_list = [ingredients]
+            elif isinstance(ingredients, list):
+                # If it's already a list, use it directly
+                ingredients_list = ingredients
+            else:
+                # Default to empty list
+                ingredients_list = []
+            
             # Then insert the new ingredients
             formatted_ingredients = []
-            for ingredient in ingredients:
+            for ingredient in ingredients_list:
                 # Handle different input formats
                 if isinstance(ingredient, dict):
                     # Format detailed ingredient
@@ -162,22 +171,36 @@ class RecipeModel:
                     if ingredient.get('notes'):
                         parts.append(f"({ingredient['notes']})")
                     ingredient_text = ' '.join(parts).strip()
+                    # Clean up empty parentheses
+                    ingredient_text = ingredient_text.replace('()', '').strip(' -')
                 else:
                     # Simple string ingredient
-                    ingredient_text = str(ingredient)
+                    ingredient_text = str(ingredient).strip()
                 
-                sql_insert_ingredient = "INSERT INTO ingredients(recipe_id, ingredient_text) VALUES(%s, %s)"
-                self.cursor.execute(sql_insert_ingredient, (recipe_id, ingredient_text))
-                formatted_ingredients.append(ingredient_text)
+                # Only insert if not empty
+                if ingredient_text:
+                    sql_insert_ingredient = "INSERT INTO ingredients(recipe_id, ingredient_text) VALUES(%s, %s)"
+                    self.cursor.execute(sql_insert_ingredient, (recipe_id, ingredient_text))
+                    formatted_ingredients.append(ingredient_text)
             
             self.conn.commit()
-        else:
-            # If ingredients not provided, fetch existing ones for the response
-            sql_get_ingredients = "SELECT ingredient_text FROM ingredients WHERE recipe_id = %s"
-            self.cursor.execute(sql_get_ingredients, (recipe_id,))
-            ingredients_result = self.cursor.fetchall()
-            formatted_ingredients = [ing['ingredient_text'] for ing in ingredients_result]
         
         # Get the updated recipe
         return self.get_recipe(recipe_id)
+    
+    def delete_recipe(self, recipe_id, user_id):
+        sql = "SELECT * from recipes where recipe_id = %s"
+        self.cursor.execute(sql, (recipe_id,))
+        recipe_found = self.cursor.fetchone()
         
+        if recipe_found and recipe_found["user_id"] == user_id:
+            sql1 = "DELETE from recipes where recipe_id = %s"
+            self.cursor.execute(sql1, (recipe_id,))
+            self.conn.commit()
+            return {"message": "Recipe successfully deleted"}
+        else:
+            return {"error": "Unauthorized - you can only delete your own recipe"}
+    
+    def share_recipe(self, recipe_id):
+        recipe = self.get_recipe(recipe_id)
+        return recipe
