@@ -18,25 +18,11 @@ CREATE TABLE recipes (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
+-- Simplified ingredients table - just uses text fields
 CREATE TABLE ingredients (
     ingredient_id INT AUTO_INCREMENT PRIMARY KEY,
     recipe_id INT,
-    name VARCHAR(100) NOT NULL,
-    category ENUM(
-        'protein',
-        'vegetable',
-        'fruit',
-        'grain',
-        'dairy',
-        'seasoning',
-        'herb',
-        'sauce',
-        'liquid',
-        'other'
-    ) DEFAULT NULL,
-    quantity VARCHAR(50) DEFAULT NULL,
-    unit VARCHAR(20) DEFAULT NULL,
-    notes VARCHAR(200) DEFAULT NULL,
+    ingredient_text TEXT NOT NULL,  -- Stores the entire ingredient as text
     FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id) ON DELETE CASCADE
 );
 
@@ -47,5 +33,3 @@ CREATE TABLE ratings (
     created_at DATETIME,
     FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id) ON DELETE CASCADE
 );
-
-INSERT INTO users (username, email) VALUES ("testuser", "test@email.com");
